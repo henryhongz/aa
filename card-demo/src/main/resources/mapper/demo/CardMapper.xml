@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.card.demo.mapper.CardMapper">
+
+<resultMap type="com.card.demo.domain.ModelMenu" id="ModelMenuResult">
+        <result property="id"    column="id"    />
+        <result property="width"    column="width"    />
+        <result property="length"    column="length"    />
+        <result property="type"    column="type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="style"    column="style"    />
+        <result property="html"    column="html"    />
+        <result property="title"    column="title"    />
+        <result property="x"    column="x"    />
+        <result property="y"    column="y"    />
+        <result property="options"    column="options"    />
+        <result property="tag"    column="tag"    />
+        <result property="image"    column="image"    />
+        <result property="link"    column="link"    />
+        <result property="difId"    column="data_interface"    />
+        <result property="dataInterface"    column="dt_interface"    />
+        <result property="dataType"    column="data_type"    />
+        <result property="readonly"    column="readonly"    />
+        <result property="param"    column="param"    />
+    </resultMap>
+
+<sql id="selectModelMenuVo">
+        SELECT m.id,m.width,m.length,m.type,m.style,m.html,m.title,m.x,m.y,m.options,m.create_time,m.tag,m.image,m.link,m.data_interface,di.dt_interface, 
+       m.data_type,m.readonly,m.param FROM `model_menu` m LEFT JOIN data_interface di on m.data_interface = di.id
+    </sql>
+
+<select id="getModelMenuListByField" parameterType="com.card.demo.domain.ModelMenu" resultMap="ModelMenuResult">
+		SELECT distinct m.id,m.width,m.length,m.type,m.style,m.html,m.title,m.x,m.y,m.options,m.create_time,m.tag,m.image,m.link,m.data_interface,di.dt_interface, 
+       m.data_type,m.readonly,m.param FROM `model_menu` m LEFT JOIN data_interface di on m.data_interface = di.id LEFT JOIN yht_project_company_field ypcf on di.field_id = ypcf.company_field_id 
+        <where>  
+        
+        <if test="projectId != null  and projectId != ''"> and (ypcf.project_id = #{projectId} or di.field_id = 0)</if>
+            <if test="type != null  and type != ''"> and m.type = #{type}</if>
+            <if test="title != null  and title != ''"> and m.title like concat('%', #{title}, '%') </if>   
+            <if test="tag != null  and tag != ''"> and m.tag = #{tag}</if>       
+        </where>
+        ORDER BY create_time DESC
+</select>
+
+<select id="getModelMenuList" parameterType="com.card.demo.domain.ModelMenu" resultMap="ModelMenuResult">
+		<include refid="selectModelMenuVo"/>
+        <where>  
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%') </if>   
+            <if test="tag != null  and tag != ''"> and tag = #{tag}</if>       
+        </where>
+        ORDER BY create_time DESC
+</select>
+
+<select id="getModelMenuListByTag" parameterType="java.util.HashMap" resultMap="ModelMenuResult">
+		SELECT distinct m.id,m.width,m.length,m.type,m.style,m.html,m.title,m.x,m.y,m.options,m.create_time,m.tag,m.image,m.link,m.data_interface,di.dt_interface, 
+       m.data_type,m.readonly,m.param FROM `model_menu` m LEFT JOIN data_interface di on m.data_interface = di.id LEFT JOIN yht_project_company_field ypcf on di.field_id = ypcf.company_field_id
+        <where> 
+        <if test="projectId != null  and projectId != ''"> and (ypcf.project_id = #{projectId} or di.field_id = 0 or m.data_interface is null)</if>               
+        <if test="tags != null  and tags != ''"> ${tags}</if>
+        </where>
+        ORDER BY create_time DESC
+</select>
+
+<insert id="insertModelMenu" parameterType="com.card.demo.domain.ModelMenu" useGeneratedKeys="true" keyProperty="id">
+        insert into model_menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="width != null">width,</if>
+            <if test="length != null">length,</if>
+            <if test="type != null">type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="style != null">style,</if>
+            <if test="html != null">html,</if>
+            <if test="title != null">title,</if>
+            <if test="x != null">x,</if>
+            <if test="y != null">y,</if>
+            <if test="options != null">options,</if>
+            <if test="tag != null">tag,</if>
+            <if test="image != null">image,</if>
+            <if test="link != null">link,</if>
+            <if test="difId != null">data_interface,</if>
+            <if test="dataType != null">data_type,</if>
+             <if test="readonly != null">readonly,</if>
+             <if test="param != null">param,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="width != null">#{width},</if>
+            <if test="length != null">#{length},</if>
+            <if test="type != null">#{type},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="style != null">#{style},</if>
+            <if test="html != null">#{html},</if>
+            <if test="title != null">#{title},</if>
+             <if test="x != null">#{x},</if>
+            <if test="y != null">#{y},</if>
+            <if test="options != null">#{options},</if>
+            <if test="tag != null">#{tag},</if>
+            <if test="image != null">#{image},</if>
+            <if test="link != null">#{link},</if>
+            <if test="difId != null">#{difId},</if>
+             <if test="dataType != null">#{dataType},</if>
+             <if test="readonly != null">#{readonly},</if>
+             <if test="param != null">#{param},</if>
+         </trim>
+    </insert>
+
+    <update id="updateModelMenu" parameterType="com.card.demo.domain.ModelMenu">
+        update model_menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="width != null">width = #{width},</if>
+            <if test="length != null">length = #{length},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="style != null">style = #{style},</if>
+            <if test="html != null">html = #{html},</if>
+            <if test="title != null">title = #{title},</if>
+             <if test="x != null">x = #{x},</if>
+            <if test="y != null">y = #{y},</if>
+            <if test="options != null">options = #{options},</if>
+            <if test="tag != null">tag = #{tag},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="link != null">link = #{link},</if>
+            <if test="difId != null">data_interface = #{difId},</if>
+            <if test="dataType != null">data_type = #{dataType},</if>
+            <if test="readonly != null">readonly = #{readonly},</if>
+            <if test="param != null">param = #{param},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteModelMenuById" parameterType="String">
+        delete from model_menu where id = #{id}
+    </delete>
+    
+    
+    <select id="getModelPageList" parameterType="com.card.demo.domain.ModelPage" resultType="com.card.demo.domain.ModelPage">
+		SELECT id,title,page_text as pageText,create_time as createTime,background,image,project_id as projectId,is_index as isIndex FROM `model_page`
+        <where>  
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%') </if> 
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId} </if>         
+        </where>
+        ORDER BY create_time DESC
+</select>
+
+<insert id="insertModelPage" parameterType="com.card.demo.domain.ModelPage" useGeneratedKeys="true" keyProperty="id">
+        insert into model_page
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="pageText != null">page_text,</if>
+            <if test="createTime != null">create_time,</if>   
+            <if test="background != null">background,</if>   
+            <if test="image != null">image,</if>     
+            <if test="projectId != null">project_id,</if>  
+            <if test="backgroundImage != null">background_image,</if>  
+            <if test="isIndex != null">is_index,</if>   
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="pageText != null">#{pageText},</if>          
+            <if test="createTime != null">#{createTime},</if>  
+            <if test="background != null">#{background},</if>  
+            <if test="image != null">#{image},</if>      
+            <if test="projectId != null">#{projectId},</if> 
+            <if test="backgroundImage != null">#{backgroundImage},</if>   
+            <if test="isIndex != null">#{isIndex},</if>   
+         </trim>
+    </insert>
+
+    <update id="updateModelPage" parameterType="com.card.demo.domain.ModelPage">
+        update model_page
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="pageText != null">page_text = #{pageText},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>  
+            <if test="background != null">background = #{background},</if>   
+            <if test="image != null">image = #{image},</if>   
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="backgroundImage != null">background_image = #{backgroundImage},</if>   
+            <if test="isIndex != null">is_index = #{isIndex},</if>  
+        </trim>
+        where id = #{id}
+    </update>
+    
+    <update id="updatePageByProjectId" parameterType="com.card.demo.domain.ModelPage">
+        update model_page
+        <trim prefix="SET" suffixOverrides=",">           
+            <if test="isIndex != null">is_index = #{isIndex},</if>  
+        </trim>
+        where project_id = #{projectId}
+    </update>
+
+    <delete id="deleteModelPageById" parameterType="String">
+        delete from model_page where id = #{id}
+    </delete>
+    
+    
+    <select id="getModelProjectList" parameterType="com.card.demo.domain.ModelProject" resultType="com.card.demo.domain.ModelProject">
+		SELECT id,project_name as projectName,create_time as createTime FROM `yht_project`
+        <where>  
+            <if test="projectName != null  and projectName != ''"> and project_name = #{projectName}</if>          
+        </where>
+        ORDER BY create_time DESC
+</select>
+
+<insert id="insertModelProject" parameterType="com.card.demo.domain.ModelProject" useGeneratedKeys="true" keyProperty="id">
+        insert into yht_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectName != null">project_name,</if>
+            <if test="createTime != null">create_time,</if>     
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectName != null">#{projectName},</if>        
+            <if test="createTime != null">#{createTime},</if>        
+         </trim>
+    </insert>
+
+    <update id="updateModelProject" parameterType="com.card.demo.domain.ModelProject">
+        update yht_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>      
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteModelProjectById" parameterType="String">
+        delete from yht_project where id = #{id}
+    </delete>
+
+<select id="DataInterfaceListByName" parameterType="String" resultType="com.card.demo.domain.DataInterface">
+		SELECT id,name,dt_interface as dtInterface FROM `data_interface`
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%') </if>          
+        </where>
+        ORDER BY name DESC
+</select>
+
+<insert id="insertModelPageCard" parameterType="com.card.demo.domain.ModelPageCard" useGeneratedKeys="true" keyProperty="id">
+        insert into model_page_card
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pageId != null">page_id,</if>
+            <if test="cardId != null">card_id,</if>  
+            <if test="localX != null">local_x,</if>
+            <if test="localY != null">local_y,</if>   
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pageId != null">#{pageId},</if>        
+            <if test="cardId != null">#{cardId},</if>   
+            <if test="localX != null">#{localX},</if>        
+            <if test="localY != null">#{localY},</if>     
+         </trim>
+    </insert>
+
+    <update id="updateModelPageCard" parameterType="com.card.demo.domain.ModelPageCard">
+        update model_page_card
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pageId != null">page_id = #{pageId},</if>
+            <if test="cardId != null">card_id = #{cardId},</if>      
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteModelPageCardByPageId" parameterType="String">
+        delete from model_page_card where page_id = #{id}
+    </delete>
+
+<select id="getModelPageCardList" parameterType="String" resultType="com.card.demo.domain.PageCard">
+		SELECT card_id as i,local_x as x,local_y as y FROM `model_page_card`
+        <where>  
+            <if test="id != null  and id != ''"> and page_id = #{id} </if>          
+        </where>
+        
+</select>
+
+
+	
+</mapper>

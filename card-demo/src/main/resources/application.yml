@@ -1,0 +1,92 @@
+spring:  
+  mvc:
+    static-path-pattern: /upload/**
+  resources:
+    static-locations: classpath:/static/,file:upload/,file:../upload/
+  application:
+    name: myspringboot
+  output:
+    ansi:
+      enabled: always
+  profiles:
+    active: dev
+  thymeleaf:
+    encoding: UTF-8
+    prefix: classpath:/templates/
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "app//." 
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 360000
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTIONS
+              - HEAD
+      routes:
+        - id: item-service   # 路由id,可以随意写
+          # 代理的服务地址；lb表示负载均衡(从eureka中获取具体服务)
+          uri: lb://item-service
+          # 路由断言，可以配置映射路径
+          predicates:
+            - Path=/api/item/**
+          filters:
+            # 表示过滤1个路径，2表示两个路径，以此类推
+            - StripPrefix=2
+    
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-connections: 500
+    min-spare-threads: 25
+    max-threads: 300
+    accept-count: 200
+  port: 8081
+mybatis:
+  type-aliases-package: com.card.demo.mapper
+  mapper-locations: classpath:mapper/**/*.xml
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+logging:
+  level:
+    com.card.demo.mapper: debug
+    
+
+---
+
+#开发配置
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://47.118.53.118:3306/unified_management?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&useSSL=false
+    username: root
+    password: '!@#$1234ABCDabcd'
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
